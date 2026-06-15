@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PrivateMessageManager {
 
-    private static final String BYPASS_DISABLED_PERMISSION = "ultimatedonutsmp.message.bypass-ᴅɪѕᴀʙʟᴇᴅ";
+    private static final String BYPASS_DISABLED_PERMISSION = "ultimatedonutsmp.message.bypass-disabled";
 
     private final UltimateDonutSmp plugin;
     private final Map<UUID, UUID> replyTargets = new ConcurrentHashMap<>();
