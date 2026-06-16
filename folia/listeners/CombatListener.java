@@ -3,7 +3,11 @@ package com.bx.ultimateDonutSmp.listeners;
 import com.bx.ultimateDonutSmp.UltimateDonutSmp;
 import com.bx.ultimateDonutSmp.models.Team;
 import com.bx.ultimateDonutSmp.utils.ColorUtils;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EnderCrystal;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class CombatListener implements Listener {
 
@@ -74,12 +79,30 @@ public class CombatListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         if (plugin.getCombatManager().isInCombat(player.getUniqueId())) {
             if (plugin.getCombatManager().isKillOnLogoutEnabled()) {
-                player.setHealth(0.0);
+                Location loc = player.getLocation();
+                World world = loc.getWorld();
+                if (world != null) {
+                    for (ItemStack item : player.getInventory().getContents()) {
+                        if (item != null && item.getType() != Material.AIR) {
+                            world.dropItemNaturally(loc, item);
+                        }
+                    }
+                    player.getInventory().clear();
+
+                    int xpToDrop = Math.min(100, player.getLevel() * 7);
+                    if (xpToDrop > 0) {
+                        world.spawn(loc, ExperienceOrb.class, orb -> orb.setExperience(xpToDrop));
+                    }
+                    player.setLevel(0);
+                    player.setExp(0.0f);
+                    player.setTotalExperience(0);
+                }
+                plugin.getCombatManager().markForDeath(player.getUniqueId());
             }
             plugin.getCombatManager().clearTag(player.getUniqueId());
         }

@@ -184,6 +184,14 @@ public class PlayerJoinQuitListener implements Listener {
             plugin.getDuelManager().handleJoin(player);
         }
 
+        // check combat logout death
+        if (plugin.getCombatManager().isMarkedForDeath(player.getUniqueId())) {
+            plugin.getCombatManager().unmarkForDeath(player.getUniqueId());
+            plugin.getFoliaScheduler().runEntityLater(player, () -> {
+                player.setHealth(0.0);
+            }, 10L);
+        }
+
         // hide join message (optional, uncomment to suppress)
         // event.joinMessage(null);
     }
