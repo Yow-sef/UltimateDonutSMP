@@ -192,6 +192,16 @@ public class PlayerJoinQuitListener implements Listener {
             }, 10L);
         }
 
+        if (!player.hasPlayedBefore()) {
+            boolean spawnOnFirstJoin = plugin.getConfigManager().getConfig().getBoolean("SETTINGS.TELEPORT-SPAWN-ON-FIRST-JOIN", true);
+            if (spawnOnFirstJoin && plugin.getSpawnManager().hasSpawn()) {
+                Location spawn = plugin.getSpawnManager().getSpawnLocation();
+                if (spawn != null) {
+                    plugin.getFoliaScheduler().teleport(player, spawn);
+                }
+            }
+        }
+
         // hide join message (optional, uncomment to suppress)
         // event.joinMessage(null);
     }
